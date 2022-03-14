@@ -9,6 +9,7 @@ var path = []
 var show_path = true
 
 onready var robot  = get_node("RobotBase")
+onready var nav_agent: NavigationAgent = get_node("RobotBase/NavigationAgent")
 onready var camera = get_node("CameraBase/Camera")
 
 func _ready():
@@ -62,9 +63,11 @@ func _unhandled_input(event):
 		var target_point = get_closest_point_to_segment(from, to)
 
 		# Set the path between the robots current location and our target.
-		path = get_simple_path(robot.translation, target_point, true)
+		nav_agent.set_target_location(target_point)
+#		nav_agent.get_next_location()
+		path = nav_agent.get_nav_path()
 
-		if show_path:
+		if show_path and path.size() > 0:
 			draw_path(path)
 
 	if event is InputEventMouseMotion:

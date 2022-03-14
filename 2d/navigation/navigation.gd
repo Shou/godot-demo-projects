@@ -4,6 +4,7 @@ export(float) var character_speed = 400.0
 var path = []
 
 onready var character = $Character
+onready var nav_agent: NavigationAgent2D = $Character/NavigationAgent2D
 
 func _process(delta):
 	var walk_distance = character_speed * delta
@@ -36,10 +37,19 @@ func move_along_path(distance):
 
 
 func _update_navigation_path(start_position, end_position):
-	# get_simple_path is part of the Navigation2D class.
-	# It returns a PoolVector2Array of points that lead you
-	# from the start_position to the end_position.
-	path = get_simple_path(start_position, end_position, true)
+	nav_agent.set_target_location(end_position)
+#	nav_agent.get_next_location()
+	path = nav_agent.get_nav_path()
+	
+	for l in get_children():
+		if l is Line2D:
+			l.queue_free()
+	
+	var line = Line2D.new()
+	line.points = path
+	line.default_color = Color.red
+	add_child(line)
+	
 	# The first point is always the start_position.
 	# We don't need it in this example as it corresponds to the character's position.
 	path.remove(0)
